@@ -1,0 +1,32 @@
+body {
+	font-family:arial;
+	/*
+	-webkit-transition: background-color 1s linear;
+	-moz-transition: background-color 1s linear;
+	transition: background-color 25ms linear;
+	*/
+}
+h1 {
+	font-size: 30pt;
+	text-align: left;
+	-webkit-transform: translate(40px, -30px) rotate(-25deg);
+	-moz-transform: translate(40px, -30px) rotate(-25deg);
+	transform: translate(40px, -30px) rotate(-25deg);
+	width: 400px;
+	background-color: black;
+	color: white;
+	padding: 80px 0 10px 20px;
+}
+#asciidancer {
+	font-size: 100pt;
+	text-align: center;
+}
+#asciidanceraudiobox {
+	text-align: center;
+}
+
+footer {
+	font-size: 8pt;
+	position: absolute;
+	bottom: 10px;
+}

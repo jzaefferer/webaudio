@@ -21,6 +21,7 @@ ul {
 	-webkit-transform: translate(250px, -30px);
 	-moz-transform: translate(250px, -30px);
 	transform: translate(250px, -30px);
+	width: 400px;
 }
 #asciidancer {
 	font-size: 100pt;

@@ -23,14 +23,50 @@ avis.visualize = function(){
 	$("body").css("backgroundColor",currentColor);
 };
 
+function loadSample(url,callback) {
+    // Load asynchronously
+
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
+
+    request.onload = function() { 
+        callback(request.response);
+    }
+    request.send();
+}
+
 $().ready(function() {
-	$.ajax({
-		url: "../samples/Vidian_-_Making_Me_Nervous_cropped.mp3",
-		success: function(data) {
-			console.log(data.length, data.substring(0, 1000));
-		}
+	var context = new webkitAudioContext();
+	var source = context.createBufferSource();
+	
+	var analyser = context.createAnalyser();
+	analyser.fftSize = 2048;
+	
+    // This AudioNode will do the amplitude modulation effect directly in JavaScript
+    var jsProcessor = context.createJavaScriptNode(4096);
+    jsProcessor.onaudioprocess = function() {
+    	//console.log(this, arguments);
+    	//source.noteOff();
+        analyser.smoothingTimeConstant = 0.75;
+        analyser.getByteFrequencyData(freqByteData);
+    };
+
+    
+    // Connect the processing graph: source -> jsProcessor -> analyser -> destination
+    source.connect(jsProcessor);
+    //jsProcessor.connect(context.destination);
+    jsProcessor.connect(analyser);
+    analyser.connect(context.destination);
+
+	loadSample("../samples/Vidian_-_Making_Me_Nervous_cropped.mp3",function(arrayBuffer){
+		source.buffer = context.createBuffer(arrayBuffer, false);
+		//source.looping = true;
+		source.noteOn(0);
 	});
+	
 	return;
+	
 	avis.audio = $("#asciidanceraudiocontrol").get(0);
 	avis.audio.addEventListener('loadedmetadata', function(){
 		avis.channels = avis.audio.mozChannels;

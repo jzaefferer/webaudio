@@ -5,7 +5,6 @@ $().ready(function() {
 		frameBufferLength = this.mozFrameBufferLength;
 		avis.signal = new Float32Array(frameBufferLength / this.mozChannels),
 		fft = new FFT(frameBufferLength / this.mozChannels, this.mozSampleRate);
-		avis.initialize();
 	})
 	.bind('MozAudioAvailable', function(event){
 		var frameBuffer = event.originalEvent.frameBuffer;

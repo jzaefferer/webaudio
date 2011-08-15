@@ -6,20 +6,22 @@ window.avis = {
 	time: new Date()
 };
 
-
-avis.initialize = function(){
-};
-
-avis.visualize = function(){
+avis.visualize = function() {
 	avis.time = new Date();
-	currentDance = avis.asciiDancer[Math.floor((Math.random()*avis.asciiDancer.length))];
-	currentColor = avis.colors[Math.floor((Math.random()*avis.colors.length))];
-	while($("#asciidancer").html() == currentDance){
-		currentDance = avis.asciiDancer[Math.floor((Math.random()*avis.asciiDancer.length))];
+	var dancer = $("#asciidancer"),
+		currentDance = dancer.html(),
+		newDance = currentDance,
+		body = $(document.body),
+		currentColor = body.css("backgroundColor"),
+		newColor = currentColor;
+
+	while (newDance === currentDance) {
+		currentDance = avis.asciiDancer[Math.floor((Math.random() * avis.asciiDancer.length))];
 	}
-	while($("body").css("backgroundColor") == currentColor){
-		currentColor = avis.colors[Math.floor((Math.random()*avis.colors.length))];
+	dancer.html(currentDance);
+
+	while (newColor === currentColor) {
+		currentColor = avis.colors[Math.floor((Math.random() * avis.colors.length))];
 	}
-	$("#asciidancer").html(currentDance);
-	$("body").css("backgroundColor",currentColor);
+	body.css("backgroundColor", currentColor);
 };

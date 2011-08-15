@@ -7,6 +7,7 @@ body {
 	*/
 }
 h1 {
+	text-shadow: -2px 2px 0 rgba(255, 0, 0, .7);
 	font-size: 30pt;
 	text-align: left;
 	-webkit-transform: translate(40px, -30px) rotate(-25deg);

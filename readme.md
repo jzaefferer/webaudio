@@ -3,6 +3,8 @@ Experiments with audio on the web
 
 Current [demo](http://jzaefferer.github.com/webaudio/).
 
+MIT-licensed, unless otherwise noted.
+
 Generic html5 resources
 -----------------------
 * [html5rocks slides](http://slides.html5rocks.com/)

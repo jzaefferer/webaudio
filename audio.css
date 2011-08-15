@@ -17,6 +17,11 @@ h1 {
 	color: white;
 	padding: 80px 0 10px 20px;
 }
+ul {
+	-webkit-transform: translate(250px, -30px);
+	-moz-transform: translate(250px, -30px);
+	transform: translate(250px, -30px);
+}
 #asciidancer {
 	font-size: 100pt;
 	text-align: center;

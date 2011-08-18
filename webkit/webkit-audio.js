@@ -1,61 +1,74 @@
 if ( !window.requestAnimationFrame ) {
-    window.requestAnimationFrame = ( function() {
-        return window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame || // comment out if FF4 is slow (it caps framerate at ~30fps: https://bugzilla.mozilla.org/show_bug.cgi?id=630127)
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
-        	window.setTimeout( callback, 1000 / 60 );
-        };
-    })();
+  window.requestAnimationFrame = (function() {
+    return window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame || // comment out if FF4 is slow (it caps framerate at ~30fps: https://bugzilla.mozilla.org/show_bug.cgi?id=630127)
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+      window.setTimeout( callback, 1000 / 60 );
+    };
+  })();
 }
 
-function loadSample(url, callback) {
-	var request = new XMLHttpRequest();
-	request.open("GET", url, true);
-	request.responseType = "arraybuffer";
+(function() {
+  var context = new webkitAudioContext();
 
-	request.onload = function() {
-		callback(request.response);
-	}
-	request.send();
-}
+  var loadSample = function(url, callback) {
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
+    request.onload = function() {
+      if (context.decodeAudioData) {
+        // Async decoding
+        context.decodeAudioData(request.response, function(buffer) {
+          callback && callback(buffer);
+        });
+      }
+      else {
+        callback && callback(context.createBuffer(request.response, true));
+      }
+    }
+    request.send();
+  };
 
-function draw() {
-	var freqByteData = new Float32Array(analyser.frequencyBinCount);
-	analyser.getFloatFrequencyData(freqByteData);
-	for (var i = 0; i < freqByteData.length; i++ ) {
-		if (freqByteData[i] > -25) {
-			if (new Date().getTime() - avis.time.getTime() > avis.timer) {
-				avis.visualize();
-			}
-		}
-	}
-	requestAnimationFrame(draw);
-}
+  $().ready(function() {
+    // TODO stream the bigger file, once the Audio DOM interface has `audioSource`
+    loadSample("../samples/Vidian_-_Making_Me_Nervous_cropped.mp3", function(arrayBuffer) {
+      var nodes = {};
+      nodes.source = context.createBufferSource();
+      nodes.source.buffer = arrayBuffer;
 
+      if (context.createBiquadFilter) {
+        nodes.filter = context.createBiquadFilter();
+        nodes.filter.type = 0; // 0 == LOWPASS
+      }
+      else {
+        nodes.filter = context.createLowPass2Filter();
+      }
+      nodes.analyser = context.createAnalyser();
+      nodes.analyser.fftSize = 2048;
+      nodes.volume = context.createGainNode();
+      nodes.volume.gain.value = 0; // Set anaylyser channel to volume 0
+      nodes.source.connect(nodes.filter);
+      nodes.filter.connect(nodes.analyser);
+      nodes.analyser.connect(nodes.volume);
+      nodes.volume.connect(context.destination);
+      nodes.source.connect(context.destination); // Connect source directly to destination
+      nodes.source.noteOn(0);
 
-$().ready(function() {
-	context = new webkitAudioContext();
-	var source = context.createBufferSource();
+      (function draw() {
+        var freqByteData = new Float32Array(nodes.analyser.frequencyBinCount);
+        nodes.analyser.getFloatFrequencyData(freqByteData);
 
-	var lowpass = context.createLowPass2Filter();
-	source.connect(lowpass);
-
-	analyser = context.createAnalyser();
-	analyser.fftSize = 2048;
-	lowpass.connect(analyser);
-
-	// TODO we really want to connect just the source to output it unfiltered
-	// for some reason the analyzer doesn't get any data when not connected to the destination
-	analyser.connect(context.destination);
-
-	// TODO stream the bigger file, once supported
-	loadSample("../samples/Vidian_-_Making_Me_Nervous_cropped.mp3",function(arrayBuffer){
-		source.buffer = context.createBuffer(arrayBuffer, false);
-		//source.looping = true;
-		source.noteOn(0);
-
-		draw();
-	});
-});
+        for (var i = 0; i < freqByteData.length; i++ ) {
+          if (freqByteData[i] > -25) {
+            if (new Date().getTime() - avis.time.getTime() > avis.timer) {
+              avis.visualize();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      })();
+    });
+  });
+})()

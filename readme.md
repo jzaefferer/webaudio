@@ -22,3 +22,7 @@ Google/W3 Web Audio API
 * [overview of proposals](http://www.w3.org/2011/audio/wiki/PubStatus)
 * [Web Audio API Specification](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html)
 * [Web Audio Demos](http://chromium.googlecode.com/svn/trunk/samples/audio/index.html)
+
+Other
+-----
+* [https://github.com/halfbyte/soundbridge.js](soundbridge.js) - web audio API with Flash fallback?

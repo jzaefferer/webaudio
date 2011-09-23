@@ -13,7 +13,7 @@ if ( !window.requestAnimationFrame ) {
 (function() {
   var context = new webkitAudioContext();
 
-  var loadSample = function(url, callback) {
+  function loadSample(url, callback) {
     var request = new XMLHttpRequest();
     request.open("GET", url, true);
     request.responseType = "arraybuffer";
@@ -27,16 +27,24 @@ if ( !window.requestAnimationFrame ) {
       else {
         callback && callback(context.createBuffer(request.response, true));
       }
-    }
+    };
     request.send();
-  };
+  }
 
   $().ready(function() {
+    if (context.createMediaElementSource) {
+      createNodes(context.createMediaElementSource(document.getElementById('asciidanceraudiocontrol')));
+    } else {
+      loadSample("../samples/Vidian_-_Making_Me_Nervous_cropped.mp3", function(arrayBuffer) {
+        var source = context.createBufferSource();
+          source.buffer = arrayBuffer;
+          createNodes(source);
+      });
+    }
     // TODO stream the bigger file, once the Audio DOM interface has `audioSource`
-    loadSample("../samples/Vidian_-_Making_Me_Nervous_cropped.mp3", function(arrayBuffer) {
+    function createNodes(source) {
       var nodes = {};
-      nodes.source = context.createBufferSource();
-      nodes.source.buffer = arrayBuffer;
+      nodes.source = source;
 
       if (context.createBiquadFilter) {
         nodes.filter = context.createBiquadFilter();
@@ -54,7 +62,9 @@ if ( !window.requestAnimationFrame ) {
       nodes.analyser.connect(nodes.volume);
       nodes.volume.connect(context.destination);
       nodes.source.connect(context.destination); // Connect source directly to destination
-      nodes.source.noteOn(0);
+      if (nodes.source.noteOn) {
+        nodes.source.noteOn(0);
+      }
 
       (function draw() {
         var freqByteData = new Float32Array(nodes.analyser.frequencyBinCount);
@@ -69,6 +79,6 @@ if ( !window.requestAnimationFrame ) {
         }
         requestAnimationFrame(draw);
       })();
-    });
+    }
   });
-})()
+})();

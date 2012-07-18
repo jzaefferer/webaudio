@@ -21,17 +21,21 @@ if ( !window.requestAnimationFrame ) {
       if (context.decodeAudioData) {
         // Async decoding
         context.decodeAudioData(request.response, function(buffer) {
-          callback && callback(buffer);
+          if (callback) {
+            callback(buffer);
+          }
         });
-      }
-      else {
-        callback && callback(context.createBuffer(request.response, true));
+      } else {
+        if (callback) {
+          callback(context.createBuffer(request.response, true));
+        }
       }
     };
     request.send();
   }
 
-  $().ready(function() {
+  // need to wait for window.load, see http://crbug.com/112368
+  $(window).load(function() {
     if (context.createMediaElementSource) {
       createNodes(context.createMediaElementSource(document.getElementById('asciidanceraudiocontrol')));
     } else {
@@ -56,12 +60,14 @@ if ( !window.requestAnimationFrame ) {
       nodes.analyser = context.createAnalyser();
       nodes.analyser.fftSize = 2048;
       nodes.volume = context.createGainNode();
-      nodes.volume.gain.value = 0; // Set anaylyser channel to volume 0
+      // Set anaylyser channel to volume 0
+      nodes.volume.gain.value = 0;
       nodes.source.connect(nodes.filter);
       nodes.filter.connect(nodes.analyser);
       nodes.analyser.connect(nodes.volume);
       nodes.volume.connect(context.destination);
-      nodes.source.connect(context.destination); // Connect source directly to destination
+      // Connect source directly to destination
+      nodes.source.connect(context.destination);
       if (nodes.source.noteOn) {
         nodes.source.noteOn(0);
       }

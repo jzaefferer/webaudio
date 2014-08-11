@@ -1,6 +1,6 @@
 window.avis = {
-	magnitude: 650.0,
-	timer: 400,
+	magnitude: 140.0,
+	timer: 300,
 	asciiDancer: ["\\o/","\\\\o","o//","~o~","\\o~","~o/","\\/o","o\\/"],
 	colors: ["rgb(255, 165, 0)","rgb(255, 255, 0)","rgb(0, 0, 255)","rgb(255, 0, 0)","rgb(255, 165, 0)"],
 	time: new Date()

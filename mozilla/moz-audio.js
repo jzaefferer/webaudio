@@ -28,7 +28,6 @@ $(function() {
 					var magnitude = fft.spectrum[i];
 		
 					if (magnitude > avis.magnitude && new Date().getTime() - avis.time.getTime() > avis.timer) {
-						console.log(magnitude);
 						avis.visualize();
 					}
 				}

@@ -11,7 +11,7 @@ if ( !window.requestAnimationFrame ) {
 }
 
 (function() {
-  var context = new webkitAudioContext();
+  var context = new AudioContext();
 
   function loadSample(url, callback) {
     var request = new XMLHttpRequest();
@@ -52,14 +52,14 @@ if ( !window.requestAnimationFrame ) {
 
       if (context.createBiquadFilter) {
         nodes.filter = context.createBiquadFilter();
-        nodes.filter.type = 0; // 0 == LOWPASS
+        nodes.filter.type = "lowpass"; // 0 == LOWPASS
       }
       else {
         nodes.filter = context.createLowPass2Filter();
       }
       nodes.analyser = context.createAnalyser();
       nodes.analyser.fftSize = 2048;
-      nodes.volume = context.createGainNode();
+      nodes.volume = context.createGain ? context.createGain() : context.createGainNode();
       // Set anaylyser channel to volume 0
       nodes.volume.gain.value = 0;
       nodes.source.connect(nodes.filter);
